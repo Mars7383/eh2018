@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Egg Hunt 2018 Glass% Calculator</title>
+    <style>
+        #speakbox {
+            width: 95%;
+            height: 800px;
+            font-size: 48px;
+        }
+
+        #addButton {
+            width: 100%;
+            height: 800px;
+            font-size: 48px;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="speakbox" autofocus></textarea>
+    <br>
+    <button id="addButton" onclick="sum()">Calculate Sum</button>
+    <script>
+        const speakbox = document.getElementById("speakbox");
+        const addButton = document.getElementById("addButton");
+
+        speakbox.value = "";
+
+        function sumNumbers(input) {
+            let wordMap = {
+                one: "1",
+                two: "2",
+                three: "3",
+                four: "4",
+                five: "5",
+                six: "6",
+                seven: "7",
+                eight: "8",
+                nine: "9",
+                ten: "10",
+                eleven: "11",
+                twelve: "12",
+                thirteen: "13",
+                fourteen: "14",
+                // similar sounding words that dictation may mishear
+                won: "1",
+                to: "2",
+                too: "2",
+                for: "4",
+                fore: "4",
+                sicks: "6",
+                ate: "8",
+            };
+
+            let entries = Object.keys(wordMap).sort((a, b) => b.length - a.length);
+            let digits = "";
+            let i = 0;
+            let lowercase = input.toLowerCase();
+
+            while (i < lowercase.length) {
+                let matched = false;
+                // try every dictionary entry at this position
+                for (let word of entries) {
+                    if (lowercase.startsWith(word, i)) {
+                        digits += wordMap[word];
+                        i += word.length;
+                        matched = true;
+                        break;
+                    }
+                }
+
+                if (!matched) {
+                    if (/\d/.test(lowercase[i])) digits += lowercase[i];
+                    i++;
+                }
+            }
+
+            let sum = 0;
+            let nums = []
+            for (let i = 0; i < digits.length; i++) {
+                let num;
+                if (digits[i] === "1" && i < digits.length - 1) {
+                    // numbers beginning with 1 are always two digits since Aces are 14
+                    num = parseInt(digits.slice(i, i + 2), 10);
+                    sum += num;
+                    i++; // skips the second digit
+                } else {
+                    num = parseInt(digits[i], 10);
+                    sum += num;
+                }
+                nums.push(num);
+            }
+            return [nums, sum];
+        }
+
+        function dec2bin(input) {
+            let output = "";
+            let curr = input;
+            for (let i = 8; i >= 0; i--) {
+                if (curr - Math.pow(2, i) >= 0) {
+                    output += "1";
+                    curr -= Math.pow(2, i);
+                } else output += "0";
+            }
+            return output;
+        }
+
+        function sum() {
+            let text = speakbox.value;
+            let res = sumNumbers(text);
+            speakbox.value = res[0].join(" + ") + "\n\n= " + res[1] + "\n\n≝ " + dec2bin(res[1]);
+            addButton.style.display = "none";
+            speakbox.setAttribute("readOnly", true);
+        }
+    </script>
+</body>
+</html>
