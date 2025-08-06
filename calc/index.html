@@ -1,57 +1,158 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Egg Hunt 2018 Glass% Calculator</title>
+    <title>Glass% Cards/Carrots Calculator</title>
+    <meta name="format-detection" content="telephone=no">
     <style>
-        #speakbox {
-            width: 95%;
-            height: 800px;
-            font-size: 48px;
+        html, body {
+            -webkit-overflow-scrolling: touch !important;
+            overflow: auto !important;
         }
 
-        #addButton {
-            width: 100%;
-            height: 800px;
+        #speakbox {
+            width: 90%;
+            height: 500px;
             font-size: 48px;
+            border: 2px solid;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #binarySum {
+            font-family: Helvetica;
+            font-size: 100px;
+            letter-spacing: 4px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        #sum {
+            font-family: Helvetica;
+            font-size: 48px;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        #cardsDisplay {
+            width: 90%;
+            table-layout: fixed;
+            border-spacing: 30px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #cardsDisplay td {
+            border: 1px solid #ccc;
+            padding: 20px;
+            text-align: center;
+            font-size: 48px;
+            border: 3px solid red;
+        }
+
+        #cardsDisplay tr {
+            line-height: 64px;
+        }
+
+        #instructions {
+            text-align: center;
+            font-size: 32px;
+        }
+
+        .white {
+            color: white;
+        }
+
+        .red {
+            color: red;
+        }
+
+        .orange {
+            color: #ff7800
+        }
+
+        .brown {
+            color: #843e00;
         }
     </style>
 </head>
 <body>
-    <textarea id="speakbox" autofocus></textarea>
+    <h1 id="binarySum"><span class="brown">000000000</span></h1>
+    <p id="sum">0</p>
+    <table id="cardsDisplay">
+        <tr>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+        </tr>
+        <tr>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+        </tr>
+        <tr>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+        </tr>
+        <tr>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+        </tr>
+    </table>
     <br>
-    <button id="addButton" onclick="sum()">Calculate Sum</button>
+    <textarea id="speakbox" onchange="sum()" autofocus></textarea>
+    <p id="instructions">Tap on the textbox above, turn on your phone's voice dictation feature, then say numbers out
+        loud.<br><br>Only the first 28 valid numbers are considered in the sum.</p>
     <script>
         const speakbox = document.getElementById("speakbox");
-        const addButton = document.getElementById("addButton");
+        const cards = Array.from(document.getElementsByTagName("td"));
+        const wordMap = {
+            one: "1",
+            two: "2",
+            three: "3",
+            four: "4",
+            five: "5",
+            six: "6",
+            seven: "7",
+            eight: "8",
+            nine: "9",
+            ten: "10",
+            eleven: "11",
+            twelve: "12",
+            thirteen: "13",
+            fourteen: "14",
+            // similar sounding words that dictation may mishear
+            won: "1",
+            to: "2",
+            too: "2",
+            for: "4",
+            fore: "4",
+            sicks: "6",
+            ate: "8",
+        };
 
         speakbox.value = "";
 
         function sumNumbers(input) {
-            let wordMap = {
-                one: "1",
-                two: "2",
-                three: "3",
-                four: "4",
-                five: "5",
-                six: "6",
-                seven: "7",
-                eight: "8",
-                nine: "9",
-                ten: "10",
-                eleven: "11",
-                twelve: "12",
-                thirteen: "13",
-                fourteen: "14",
-                // similar sounding words that dictation may mishear
-                won: "1",
-                to: "2",
-                too: "2",
-                for: "4",
-                fore: "4",
-                sicks: "6",
-                ate: "8",
-            };
-
             let entries = Object.keys(wordMap).sort((a, b) => b.length - a.length);
             let digits = "";
             let i = 0;
@@ -78,14 +179,15 @@
             let sum = 0;
             let nums = []
             for (let i = 0; i < digits.length; i++) {
+                if (nums.length >= 28) break;
                 let num;
                 if (digits[i] === "1" && i < digits.length - 1) {
                     // numbers beginning with 1 are always two digits since Aces are 14
-                    num = parseInt(digits.slice(i, i + 2), 10);
+                    num = parseInt(digits.slice(i, i + 2));
                     sum += num;
                     i++; // skips the second digit
                 } else {
-                    num = parseInt(digits[i], 10);
+                    num = parseInt(digits[i]);
                     sum += num;
                 }
                 nums.push(num);
@@ -98,20 +200,56 @@
             let curr = input;
             for (let i = 8; i >= 0; i--) {
                 if (curr - Math.pow(2, i) >= 0) {
-                    output += "1";
+                    output += "<span class=\"orange\">1</span>";
                     curr -= Math.pow(2, i);
-                } else output += "0";
+                } else output += "<span class=\"brown\">0</span>";
             }
             return output;
         }
 
-        function sum() {
-            let text = speakbox.value;
-            let res = sumNumbers(text);
-            speakbox.value = res[0].join(" + ") + "\n\n= " + res[1] + "\n\n≝ " + dec2bin(res[1]);
-            addButton.style.display = "none";
-            speakbox.setAttribute("readOnly", true);
+        function faceCard(number) {
+            switch (number) {
+                case 11:
+                    return "J";
+                case 12:
+                    return "Q";
+                case 13:
+                    return "K";
+                case 14:
+                    return "A";
+                default:
+                    return number;
+            }
         }
+
+        function sum(e) {
+            if (e == undefined) return;
+            let text = e.target.value;
+            let [numbers, sum] = sumNumbers(text);
+            document.getElementById("binarySum").innerHTML = dec2bin(sum);
+            document.getElementById("sum").innerHTML = sum;
+            let i = 0;
+            cards.forEach(card => {
+                if (i < numbers.length) {
+                    card.classList.remove("white");
+                    card.classList.add("red");
+                    card.innerText = faceCard(numbers[i]);
+                } else {
+                    card.classList.remove("red");
+                    card.classList.add("white");
+                    card.innerText = "?";
+                }
+                i++;
+            })
+        }
+
+        speakbox.addEventListener('input', sum);
+        speakbox.addEventListener('focus', () => {
+            setTimeout(() => {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }, 750)
+        })
     </script>
 </body>
 </html>
