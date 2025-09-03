@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Glass% Cards/Carrots Calculator</title>
+    <meta name="format-detection" content="telephone=no">
+    <style>
+        body {
+            background-color: rgba(0, 0, 0, 0.25);
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-app-region: drag;
+            -webkit-text-stroke: unset;
+        }
+
+        #binarySum {
+            font-family: Helvetica;
+            font-size: 40px;
+            letter-spacing: 4px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        #sum {
+            font-family: Helvetica;
+            font-size: 24px;
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        #cardsDisplay {
+            width: 90%;
+            table-layout: fixed;
+            border-spacing: 10px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #cardsDisplay td {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+            font-size: 24px;
+            border: 3px solid red;
+        }
+
+        #cardsDisplay tr {
+            line-height: 32px;
+        }
+
+        #instructions {
+            text-align: center;
+            font-size: 32px;
+        }
+
+        .white {
+            color: rgb(199, 199, 199);
+        }
+
+        .gray {
+            color: gray;
+        }
+
+        .red {
+            color: red;
+        }
+
+        .orange {
+            color: #ff7700
+        }
+
+        .brown {
+            color: #a74e00;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="binarySum"><span class="brown">000000000</span></h1>
+    <p id="sum" class="white">0</p>
+    <table id="cardsDisplay">
+        <tr>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+        </tr>
+        <tr>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+        </tr>
+        <tr>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+        </tr>
+        <tr>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+            <td class="white">?</td>
+        </tr>
+    </table>
+    <br>
+
+    <script>
+        const { ipcRenderer } = require("electron");
+        const cards = Array.from(document.getElementsByTagName("td"));
+        const wordMap = {
+            one: "1",
+            two: "2",
+            three: "3",
+            four: "4",
+            five: "5",
+            six: "6",
+            seven: "7",
+            eight: "8",
+            nine: "9",
+            ten: "10",
+            eleven: "11",
+            twelve: "12",
+            thirteen: "13",
+            fourteen: "14",
+            // similar sounding words that dictation may mishear
+            won: "1",
+            to: "2",
+            too: "2",
+            for: "4",
+            fore: "4",
+            sicks: "6",
+            ate: "8",
+        };
+
+        function sumNumbers(input) {
+            let entries = Object.keys(wordMap).sort((a, b) => b.length - a.length);
+            let digits = "";
+            let i = 0;
+            let lowercase = input.toLowerCase();
+
+            while (i < lowercase.length) {
+                let matched = false;
+                // try every dictionary entry at this position
+                for (let word of entries) {
+                    if (lowercase.startsWith(word, i)) {
+                        digits += wordMap[word];
+                        i += word.length;
+                        matched = true;
+                        break;
+                    }
+                }
+
+                if (!matched) {
+                    if (/\d/.test(lowercase[i])) digits += lowercase[i];
+                    i++;
+                }
+            }
+
+            let sum = 0;
+            let nums = []
+            for (let i = 0; i < digits.length; i++) {
+                if (nums.length >= 28) break;
+                let num;
+                if (digits[i] === "1" && i < digits.length - 1) {
+                    // numbers beginning with 1 are always two digits since Aces are 14
+                    num = parseInt(digits.slice(i, i + 2));
+                    sum += num;
+                    i++; // skips the second digit
+                } else {
+                    num = parseInt(digits[i]);
+                    sum += num;
+                }
+                nums.push(num);
+            }
+            return [nums, sum];
+        }
+
+        function dec2bin(input) {
+            let output = "";
+            let curr = input;
+            for (let i = 8; i >= 0; i--) {
+                if (curr - Math.pow(2, i) >= 0) {
+                    output += "<span class=\"orange\">1</span>";
+                    curr -= Math.pow(2, i);
+                } else output += "<span class=\"brown\">0</span>";
+            }
+            return output;
+        }
+
+        function faceCard(number) {
+            switch (number) {
+                case 11:
+                    return "J";
+                case 12:
+                    return "Q";
+                case 13:
+                    return "K";
+                case 14:
+                    return "A";
+                default:
+                    return number;
+            }
+        }
+
+        function sum(text) {
+            let [numbers, sum] = sumNumbers(text);
+            document.getElementById("binarySum").innerHTML = dec2bin(sum);
+            document.getElementById("sum").innerHTML = sum;
+            let i = 0;
+            cards.forEach(card => {
+                if (i < numbers.length) {
+                    card.classList.remove("white");
+                    card.classList.add("red");
+                    card.innerText = faceCard(numbers[i]);
+                } else {
+                    card.classList.remove("red");
+                    card.classList.add("white");
+                    card.innerText = "?";
+                }
+                i++;
+            })
+        }
+
+        let contents = "";
+        ipcRenderer.on('clipboard-update', function (evt, message) {
+            contents += message;
+            if (message == "RESET")
+                contents = "";
+            sum(contents);
+        });
+
+    </script>
+</body>
+
+</html>
