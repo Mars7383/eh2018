@@ -1,67 +1,105 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Glass% Cards/Carrots Calculator</title>
     <meta name="format-detection" content="telephone=no">
     <style>
-        html, body {
-            -webkit-overflow-scrolling: touch !important;
-            overflow: auto !important;
+        body {
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-app-region: drag;
+            -webkit-text-stroke: unset;
         }
 
-        #speakbox {
-            width: 90%;
-            height: 500px;
-            font-size: 48px;
-            border: 2px solid;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
+        #main {
+            padding-top: 5px;
+            padding-bottom: 7px;
+            background-color: rgba(0, 0, 0, 0.25);
+            border-radius: 10px;
         }
 
-        #binarySum {
-            font-family: Helvetica;
-            font-size: 100px;
-            letter-spacing: 4px;
+        #sumDisplay {
+            margin-left: 9%;
+            margin-right: 9%;
+        }
+
+        .binaryLabel {
+            font-family: DejaVu Sans Mono, monospace;
+            font-size: 12px;
+            color: white;
+            margin-left: 4px;
+            margin-right: 14px;
+            text-align: right;
+        }
+        .binarySum {
             text-align: center;
-            margin-bottom: 10px;
+            font-family: Helvetica;
+            font-size: 30px;
+            letter-spacing: 4px;
+            margin-bottom: 2px;
+            margin-top: 5px;
         }
 
         #sum {
             font-family: Helvetica;
-            font-size: 48px;
+            font-size: 18px;
             text-align: center;
-            margin-top: 10px;
-            margin-bottom: 10px;
+            margin-top: 5px;
+            margin-bottom: 5px;
         }
 
         #cardsDisplay {
             width: 90%;
             table-layout: fixed;
-            border-spacing: 30px;
+            border-spacing: 10px;
             margin-left: auto;
             margin-right: auto;
         }
 
         #cardsDisplay td {
             border: 1px solid #ccc;
-            padding: 20px;
+            padding: 5px;
             text-align: center;
-            font-size: 48px;
+            font-size: 16px;
             border: 3px solid red;
         }
 
         #cardsDisplay tr {
-            line-height: 64px;
+            line-height: 32px;
         }
 
-        #instructions {
-            text-align: center;
-            font-size: 32px;
+        .zscorelabel {
+            margin-top: 5px;
+            font-size: 12px;
+            color: white;
+            margin-left: 5px;
+            font-family: DejaVu Sans Mono, monospace;
+        }
+
+        #zscore {
+            background: transparent;
+            border-color: white;
+            color: white;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            width: 25px;
+            -webkit-user-select: all;
+            user-select: all;
+            -webkit-app-region: none;
+            font-family: DejaVu Sans Mono, monospace;
+        }
+        #zscore:focus {
+            outline-width: 0;
         }
 
         .white {
-            color: white;
+            color: rgb(199, 199, 199);
+        }
+
+        .gray {
+            color: gray;
         }
 
         .red {
@@ -69,62 +107,93 @@
         }
 
         .orange {
-            color: #ff7800
+            color: #ff7700
+        }
+
+        .orange-dim {
+            color: #9f4a00
         }
 
         .brown {
-            color: #843e00;
+            color: #a74e00;
+        }
+
+        .brown-dim {
+            color: #6d3300;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
-<body>
-    <h1 id="binarySum"><span class="brown">000000000</span></h1>
-    <p id="sum">0</p>
-    <table id="cardsDisplay">
+
+<body><div id="main">
+    <table id="sumDisplay">
         <tr>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
+            <td><span class="binaryLabel">Min:</span></td>
+            <td><h1 class="binarySum" id="min2"><span class="brown">000000000</span></h1></td>
+            <td><span class="binaryLabel" id="min10">(0)</span></td>
         </tr>
         <tr>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-        </tr>
-        <tr>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-        </tr>
-        <tr>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
-            <td class="white">?</td>
+            <td><span class="binaryLabel">Max:</span></td>
+            <td><h1 class="binarySum" id="max2"><span class="brown-dim">000000000</span></h1></td>
+            <td><span class="binaryLabel" id="max10">(0)</span></td>
         </tr>
     </table>
-    <br>
-    <textarea id="speakbox" onchange="sum()" autofocus></textarea>
-    <p id="instructions">Tap on the textbox above, turn on your phone's voice dictation feature, then say numbers out
-        loud.<br><br>Only the first 28 valid numbers are considered in the sum.</p>
+    <table id="cardsDisplay">
+        <tr>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+        </tr>
+        <tr class="hidden">
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+        </tr>
+        <tr class="hidden">
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+        </tr>
+        <tr class="hidden">
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+            <td class="card white">?</td>
+        </tr>
+    </table>
+    <span class="zscorelabel" style="margin-left: 8%;">z = </span><input id="zscore" value="1.0"></input><span class="zscorelabel" id="percentLabel">(68.3% chance)</span>
+    </div>
+    
     <script>
-        const speakbox = document.getElementById("speakbox");
-        const cards = Array.from(document.getElementsByTagName("td"));
+        const { ipcRenderer } = require("electron");
+
+        const cards = Array.from(document.getElementsByClassName("card"));
+        const cardsDisplay = document.getElementById("cardsDisplay");
+        const min2 = document.getElementById("min2");
+        const min10 = document.getElementById("min10");
+        const max2 = document.getElementById("max2");
+        const max10 = document.getElementById("max10");
+        const percentLabel = document.getElementById("percentLabel");
+        const zscore = document.getElementById("zscore");
+
         const wordMap = {
             one: "1",
             two: "2",
@@ -147,12 +216,43 @@
             for: "4",
             fore: "4",
             sicks: "6",
-            ate: "8",
+            ate: "8"
         };
 
-        speakbox.value = "";
+        // derived from empirical data
+        const sigmas = {
+            "1": 58.18571,
+            "2": 40.699451,
+            "3": 33.443447,
+            "4": 27.562692,
+            "5": 24.440478,
+            "6": 21.582692,
+            "7": 19.5796,
+            "8": 17.983576,
+            "9": 16.46847,
+            "10": 14.957992,
+            "11": 14.002129,
+            "12": 12.904212,
+            "13": 12.030459,
+            "14": 11.23905,
+            "15": 10.549317,
+            "16": 9.735853,
+            "17": 8.850755,
+            "18": 8.386907,
+            "19": 7.692031,
+            "20": 7.178366,
+            "21": 6.452591,
+            "22": 5.967997,
+            "23": 5.228667,
+            "24": 4.595244,
+            "25": 3.905976,
+            "26": 3.073574,
+            "27": 2.166293
+        }
+
 
         function sumNumbers(input) {
+            console.log("Current input: " + input);
             let entries = Object.keys(wordMap).sort((a, b) => b.length - a.length);
             let digits = "";
             let i = 0;
@@ -184,25 +284,27 @@
                 if (digits[i] === "1" && i < digits.length - 1) {
                     // numbers beginning with 1 are always two digits since Aces are 14
                     num = parseInt(digits.slice(i, i + 2));
-                    sum += num;
                     i++; // skips the second digit
                 } else {
                     num = parseInt(digits[i]);
-                    sum += num;
                 }
+                if (num < 2 || num > 14) continue;
+                sum += num;
                 nums.push(num);
             }
             return [nums, sum];
         }
 
-        function dec2bin(input) {
+        function dec2bin(input, dimmed) {
             let output = "";
             let curr = input;
+            let orange = dimmed ? "orange-dim" : "orange";
+            let brown = dimmed ? "brown-dim" : "brown";
             for (let i = 8; i >= 0; i--) {
                 if (curr - Math.pow(2, i) >= 0) {
-                    output += "<span class=\"orange\">1</span>";
+                    output += `<span class="${orange}">1</span>`;
                     curr -= Math.pow(2, i);
-                } else output += "<span class=\"brown\">0</span>";
+                } else output += `<span class="${brown}">0</span>`;
             }
             return output;
         }
@@ -222,12 +324,34 @@
             }
         }
 
-        function sum(e) {
-            if (e == undefined) return;
-            let text = e.target.value;
+        let zScore = 1.0;
+
+        function calculate(text) {
             let [numbers, sum] = sumNumbers(text);
-            document.getElementById("binarySum").innerHTML = dec2bin(sum);
-            document.getElementById("sum").innerHTML = sum;
+            
+            let estimatedSum = sum * 28/numbers.length;
+            let min = Math.round(-1 * zScore * sigmas["" + numbers.length] + estimatedSum); // x = -z * sd + mean
+            let max = Math.round( zScore * sigmas["" + numbers.length] + estimatedSum); // x = z * sd + mean
+            if (isNaN(min))
+                min = 0;
+            if (isNaN(max))
+                max = 0;
+            min2.innerHTML = dec2bin(min, false);
+            min10.innerHTML = "(" + min + ")";
+            max2.innerHTML = dec2bin(max, true);
+            max10.innerHTML = "(" + max + ")";
+
+            let rowIdx = 0;
+            Array.from(cardsDisplay.children[0].children).forEach(row => { // tbody is child 0
+                if (rowIdx != 0) {
+                    if (numbers.length / 7 > rowIdx)
+                        row.classList.remove("hidden");
+                    else
+                        row.classList.add("hidden");
+                }
+                rowIdx++;
+            })
+
             let i = 0;
             cards.forEach(card => {
                 if (i < numbers.length) {
@@ -243,13 +367,62 @@
             })
         }
 
-        speakbox.addEventListener('input', sum);
-        speakbox.addEventListener('focus', () => {
+        https://stackoverflow.com/a/12771138
+        function erf(x) {
+            var z;
+            const ERF_A = 0.147;
+            var the_sign_of_x;
+            if (0 == x) {
+                the_sign_of_x = 0;
+                return 0;
+            } else if (x > 0) {
+                the_sign_of_x = 1;
+            } else {
+                the_sign_of_x = -1;
+            }
+            
+            var one_plus_axsqrd = 1 + ERF_A * x * x;
+            var four_ovr_pi_etc = 4 / Math.PI + ERF_A * x * x;
+            var ratio = four_ovr_pi_etc / one_plus_axsqrd;
+            ratio *= x * -x;
+            var expofun = Math.exp(ratio);
+            var radical = Math.sqrt(1 - expofun);
+            z = radical * the_sign_of_x;
+            return z;
+        }
+
+        function normalCDF(z) {
+            return 0.5 * (1 + erf(z/Math.sqrt(2)));
+        }
+
+        let focused = false;
+        zscore.addEventListener('input', function(e) {
+            if (e == undefined) return;
+            focused = Date.now();
+            let text = e.target.value;
+            zScore =  Math.abs(parseFloat(text));
+            if (isNaN(zScore)) zScore = 1.0;
+            let percentChance = Math.round((normalCDF(zScore) - normalCDF(-1 * zScore)) * 1000)/10;
+            percentLabel.innerHTML = `(${percentChance}% chance)`;
+            // unfocus after 5 seconds of inactivity
             setTimeout(() => {
-                document.body.scrollTop = 0;
-                document.documentElement.scrollTop = 0;
-            }, 750)
-        })
+                if (!focused) return;
+                if (Date.now() - focused >= 5000) {
+                    document.activeElement.blur();
+                    focused = false;
+                }
+            }, 5000);
+        });
+
+        let contents = "";
+        ipcRenderer.on('clipboard-update', function (evt, message) {
+            contents += message;
+            if (message == "RESET")
+                contents = "";
+            calculate(contents);
+        });
+
     </script>
 </body>
+
 </html>
