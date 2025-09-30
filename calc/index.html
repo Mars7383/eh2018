@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Glass% Cards/Carrots Calculator</title>
     <meta name="format-detection" content="telephone=no">
     <style>
-        body {
-            background-color: rgba(0, 0, 0, 0.25);
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-app-region: drag;
-            -webkit-text-stroke: unset;
+        html, body {
+            -webkit-overflow-scrolling: touch !important;
+            overflow: auto !important;
+        }
+
+        #speakbox {
+            width: 90%;
+            height: 500px;
+            font-size: 48px;
+            border: 2px solid;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         #binarySum {
             font-family: Helvetica;
-            font-size: 40px;
+            font-size: 100px;
             letter-spacing: 4px;
             text-align: center;
             margin-bottom: 10px;
@@ -23,7 +29,7 @@
 
         #sum {
             font-family: Helvetica;
-            font-size: 24px;
+            font-size: 48px;
             text-align: center;
             margin-top: 10px;
             margin-bottom: 10px;
@@ -32,21 +38,21 @@
         #cardsDisplay {
             width: 90%;
             table-layout: fixed;
-            border-spacing: 10px;
+            border-spacing: 30px;
             margin-left: auto;
             margin-right: auto;
         }
 
         #cardsDisplay td {
             border: 1px solid #ccc;
-            padding: 5px;
+            padding: 20px;
             text-align: center;
-            font-size: 24px;
+            font-size: 48px;
             border: 3px solid red;
         }
 
         #cardsDisplay tr {
-            line-height: 32px;
+            line-height: 64px;
         }
 
         #instructions {
@@ -55,11 +61,7 @@
         }
 
         .white {
-            color: rgb(199, 199, 199);
-        }
-
-        .gray {
-            color: gray;
+            color: white;
         }
 
         .red {
@@ -67,18 +69,17 @@
         }
 
         .orange {
-            color: #ff7700
+            color: #ff7800
         }
 
         .brown {
-            color: #a74e00;
+            color: #843e00;
         }
     </style>
 </head>
-
 <body>
     <h1 id="binarySum"><span class="brown">000000000</span></h1>
-    <p id="sum" class="white">0</p>
+    <p id="sum">0</p>
     <table id="cardsDisplay">
         <tr>
             <td class="white">?</td>
@@ -118,9 +119,11 @@
         </tr>
     </table>
     <br>
-
+    <textarea id="speakbox" onchange="sum()" autofocus></textarea>
+    <p id="instructions">Tap on the textbox above, turn on your phone's voice dictation feature, then say numbers out
+        loud.<br><br>Only the first 28 valid numbers are considered in the sum.</p>
     <script>
-        const { ipcRenderer } = require("electron");
+        const speakbox = document.getElementById("speakbox");
         const cards = Array.from(document.getElementsByTagName("td"));
         const wordMap = {
             one: "1",
@@ -146,6 +149,8 @@
             sicks: "6",
             ate: "8",
         };
+
+        speakbox.value = "";
 
         function sumNumbers(input) {
             let entries = Object.keys(wordMap).sort((a, b) => b.length - a.length);
@@ -217,7 +222,9 @@
             }
         }
 
-        function sum(text) {
+        function sum(e) {
+            if (e == undefined) return;
+            let text = e.target.value;
             let [numbers, sum] = sumNumbers(text);
             document.getElementById("binarySum").innerHTML = dec2bin(sum);
             document.getElementById("sum").innerHTML = sum;
@@ -236,15 +243,13 @@
             })
         }
 
-        let contents = "";
-        ipcRenderer.on('clipboard-update', function (evt, message) {
-            contents += message;
-            if (message == "RESET")
-                contents = "";
-            sum(contents);
-        });
-
+        speakbox.addEventListener('input', sum);
+        speakbox.addEventListener('focus', () => {
+            setTimeout(() => {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+            }, 750)
+        })
     </script>
 </body>
-
 </html>
