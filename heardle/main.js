@@ -12,7 +12,7 @@ const songs = [
   ["the_wizards_harp", "The Wizard's Harp", "Bslick", "v0UmfpyRX3M", "Merlin's Swamp > Tower"],
   ["danger_afoot", "Danger Afoot", "Bslick", "OoGajz49bTg", "Unused"],
   ["daenerys", "Daenerys", "Bslick", "0Spi9AKnDgE", "Merlin's Swamp > Sword/Dragon"],
-  ["thats_aymor_egg", "That's Aymor Egg", "Bslick", "A6LeOSSc-SM", "Easterbury Canals"]
+  ["thats_aymor_egg", "That's Aymor Egg", "Bslick", "A6LeOSSc-SM", "Easterbury Canals"],
   ["bonka_bonka", "Bonka Bonka", "Bslick", "5c6fUUnZHIQ", "Easterbury Canals > Factory"],
   ["egg_buns_only", "Egg Buns Only", "Bslick", "gd0sZsi6Ip8", "Easterbury Canals > Restaurant"],
   ["the_sucrose_grotto", "The Sucrose Grotto", "Bslick", "UChFReGNrSQ", "Easterbury Canals > Sugar Cave"],
@@ -35,7 +35,7 @@ const songs = [
   ["theres_aymor_where_that_came_from", "There's Aymor Where That Came From", "Bslick", "9f8gQry1-pc", "Aymor's Lair"],
   ["snowfleggs", "Snowfleggs", "Bslick", "WgGunBY5iOo", "Unused"],
   ["the_workshop", "The Workshop", "Bslick", "zSb7LpyTb4E", "Blizzard Valley"],
-  ["time_to_fly", "Time to Fly", "Bslick", "4VWGqoXg31Y", "Unused"]
+  ["time_to_fly", "Time to Fly", "Bslick", "4VWGqoXg31Y", "Unused"],
   ["it_was_us", "It Was Us", "Bslick", "NEB_B9Mb5No", "Fractured Space"],
   ["welcome_home_remix", "Welcome Home (Remix)", "Ravenshield", "u3E8ZWotDB4", "Mega Corporation"],
   ["shrine_of_the_eggs", "Shrine of the Eggs", "Roblox", "05skRoDDfN8", "Office of Creators"]
