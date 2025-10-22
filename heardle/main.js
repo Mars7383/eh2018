@@ -38,7 +38,9 @@ const songs = [
   ["time_to_fly", "Time to Fly", "Bslick", "4VWGqoXg31Y", "Unused"],
   ["it_was_us", "It Was Us", "Bslick", "NEB_B9Mb5No", "Fractured Space"],
   ["welcome_home_remix", "Welcome Home (Remix)", "Ravenshield", "u3E8ZWotDB4", "Mega Corporation"],
-  ["shrine_of_the_eggs", "Shrine of the Eggs", "Roblox", "05skRoDDfN8", "Office of Creators"]
+  ["shrine_of_the_eggs", "Shrine of the Eggs", "Roblox", "05skRoDDfN8", "Office of Creators"],
+  ["mirage", "Mirage", "Bslick", "NA0CN2ZZZbY", "Mirage"],
+  ["covered_with_dust", "Covered With Dust", "Bslick", "E6Hv1Gn4d34", "Unused"]
 ];
 const segment_lengths = [1, 1, 1, 2, 3, 5];
 const total_preview_length = segment_lengths.reduce((a, b) => a + b, 0);
