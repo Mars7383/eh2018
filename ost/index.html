@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Egg Hunt 2018 OST%</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+    <script defer src="main.js"></script>
+  </head>
+  <body>
+    <button id="play-overlay" type="button">Click to Start</button>
+    <main>
+      <section class="game" aria-label="OST%">
+        <div class="game-summary">
+          <h1 class="view-title">Egg Hunt 2018 OST%</h1>
+          <output id="live-timer" aria-label="Total time">0:00.00</output>
+        </div>
+        <p id="last-track">Last track: N/A</p>
+        <div class="game-panel">
+          <form id="guess-form" novalidate>
+            <div class="autocomplete">
+              <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+              <input
+                id="song-input"
+                type="search"
+                placeholder="Search for the title"
+                spellcheck="false"
+                autocorrect="off"
+                autocomplete="off"
+                autocapitalize="none"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-controls="song-list"
+                aria-expanded="false"
+              >
+              <ul id="song-list" role="listbox" hidden></ul>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="results" class="results" hidden aria-live="polite">
+        <h1 class="view-title">Egg Hunt 2018 OST%</h1>
+        <div class="final-time">
+          <output id="final-time-summary">0:00.00</output>
+        </div>
+        <table aria-labelledby="splits-title">
+          <caption>
+            <span class="caption-row">
+              <span id="splits-title">Splits</span>
+              <label class="unshuffle-control">
+                <input id="unshuffle" type="checkbox">
+                Unshuffle
+              </label>
+            </span>
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Song</th>
+              <th scope="col">Time</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" colspan="2">
+                Total time <span id="total-delta" class="delta"></span>
+              </th>
+              <td id="total-time"></td>
+            </tr>
+            <tr>
+              <th scope="row" colspan="2">Sum of best segments</th>
+              <td id="sum-of-best"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </section>
+    </main>
+  </body>
+</html>

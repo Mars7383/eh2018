@@ -1,0 +1,298 @@
+:root {
+  color-scheme: dark;
+  font-family: "Century Gothic", "Futura Medium", system-ui, sans-serif;
+  color: #e3dad5;
+  background: #121212;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html,
+body,
+main {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+}
+
+#play-overlay {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.78);
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+}
+
+main,
+.game {
+  min-height: 100vh;
+}
+
+.game {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.game-summary {
+  position: absolute;
+  top: 4rem;
+  right: max(1rem, 5vw);
+  left: max(1rem, 5vw);
+}
+
+.game-panel {
+  width: min(90vw, 1100px);
+}
+
+.view-title {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.5rem, 4vw, 2.75rem);
+  text-align: center;
+}
+
+#live-timer {
+  display: block;
+  margin: 0.5rem 0 0;
+  color: transparent;
+  background: linear-gradient(to bottom, #dedede 0%, #acacac 48%, #707070 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: center;
+}
+
+#live-timer.running {
+  background-image: linear-gradient(to bottom, #8dffa9 0%, #00cc36 48%, #008a24 100%);
+}
+
+#last-track {
+  position: absolute;
+  top: calc(25vh + 5rem);
+  right: max(1rem, 5vw);
+  left: max(1rem, 5vw);
+  margin: 0;
+  transform: translateY(-50%);
+  color: #acacac;
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  text-align: center;
+}
+
+#guess-form {
+  width: 100%;
+}
+
+.autocomplete {
+  position: relative;
+  width: 100%;
+}
+
+#song-input {
+  width: 100%;
+  height: clamp(4.5rem, 8vw, 6.5rem);
+  margin: 0;
+  padding: 0 4rem;
+  border: 2px solid #595959;
+  border-radius: 0;
+  outline: none;
+  color: #e3dad5;
+  background: #121212;
+  font: inherit;
+  font-size: clamp(1.15rem, 2.5vw, 2rem);
+  transition: border-color 100ms ease;
+}
+
+#song-input:focus {
+  border-color: #595959;
+}
+
+#song-input.incorrect,
+#song-input.incorrect:focus {
+  border-color: #dc2626;
+}
+
+#song-input.correct,
+#song-input.correct:focus {
+  border-color: #1db954;
+}
+
+#song-input::placeholder {
+  color: #888;
+}
+
+#song-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.search-icon {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 1.4rem;
+  width: 1.7rem;
+  height: 1.7rem;
+  transform: translateY(-50%);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+#song-list {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  width: 100%;
+  max-height: min(45vh, 25rem);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border: 1px solid #595959;
+  background: #121212;
+  list-style: none;
+}
+
+#song-list li {
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  font-size: clamp(1rem, 1.7vw, 1.25rem);
+}
+
+#song-list li:hover,
+#song-list li[aria-selected="true"] {
+  background: #333;
+}
+
+.song-detail {
+  color: #999;
+}
+
+.results {
+  min-height: 100vh;
+  padding: 4rem max(1rem, 5vw);
+}
+
+.final-time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+#final-time-summary {
+  margin-top: 0.5rem;
+  color: transparent;
+  background: linear-gradient(to bottom, #8bd3ff 0%, #38a8eb 48%, #1676b8 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: normal;
+}
+
+.results table {
+  width: min(100%, 900px);
+  margin: 0 auto;
+  border-collapse: collapse;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+}
+
+.results caption {
+  margin-bottom: 1.5rem;
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 700;
+  text-align: left;
+}
+
+.caption-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.unshuffle-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
+.unshuffle-control input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+}
+
+.results th,
+.results td {
+  padding: 0.9rem;
+  border: 1px solid #595959;
+  text-align: left;
+}
+
+.results td:last-child,
+.results th:last-child {
+  text-align: right;
+}
+
+.results tfoot {
+  font-weight: 700;
+}
+
+.delta {
+  color: var(--delta-color, #acacac);
+  margin-left: 0.45rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.delta.no-comparison {
+  color: #acacac;
+}
+
+.delta.ahead {
+  color: var(--delta-color, #00cc36);
+}
+
+.delta.behind {
+  color: var(--delta-color, #cc1200);
+}
+
+.delta.best-segment {
+  color: var(--delta-color, #00cc36);
+}
+
+.split-time,
+#total-time,
+#sum-of-best {
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
