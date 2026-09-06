@@ -13,6 +13,12 @@ const form = document.getElementById("guess-form");
 const input = document.getElementById("song-input");
 const listbox = document.getElementById("song-list");
 const playOverlay = document.getElementById("play-overlay");
+const startButton = document.getElementById("start-button");
+const includeUnusedCheckbox = document.getElementById("include-unused");
+const includeRpoCheckbox = document.getElementById("include-rpo");
+const includeUnusedDisplay = document.getElementById("include-unused-display");
+const includeRpoDisplay = document.getElementById("include-rpo-display");
+const volumeSlider = document.getElementById("volume-slider");
 const liveTimer = document.getElementById("live-timer");
 const lastTrack = document.getElementById("last-track");
 const game = document.querySelector(".game");
@@ -24,6 +30,7 @@ const totalDelta = document.getElementById("total-delta");
 const sumOfBest = document.getElementById("sum-of-best");
 const unshuffle = document.getElementById("unshuffle");
 const bestTimesStorageKey = "egg-hunt-ost-best-times";
+const optionsStorageKey = "egg-hunt-ost-options";
 
 let playlist = [];
 let currentIndex = 0;
@@ -38,6 +45,27 @@ let feedbackTimer = null;
 let timerFrame = null;
 let comparisonBestTimes = null;
 let finishSound = null;
+let currentGameMode = null;
+
+function getGameModeKey(includeUnused, includeRpo) {
+  if (includeUnused && includeRpo) return "unused-rpo";
+  if (includeUnused) return "unused-only";
+  if (includeRpo) return "rpo-only";
+  return "neither";
+}
+
+function buildPlaylist() {
+  const includeUnused = includeUnusedCheckbox.checked;
+  const includeRpo = includeRpoCheckbox.checked;
+  const filtered = songs.filter((song) => {
+    const isRpo = song[2] !== "Bslick"; // Bslick didnt compose any of the RPO music
+    if (isRpo) return includeRpo;
+    const location = song[4] || "";
+    if (location.includes("Unused")) return includeUnused;
+    return true;
+  });
+  playlist = shuffle(filtered);
+}
 
 function shuffle(items) {
   const shuffled = [...items];
@@ -66,32 +94,73 @@ function formatDelta(milliseconds) {
   return `${sign}${formatTime(Math.abs(milliseconds))}`;
 }
 
-function loadBestTimes() {
-  let bestTimes = {
-    version: 1,
-    tracks: {},
-    total: null
-  };
+function loadOptions() {
+  const options = { includeUnused: true, includeRpo: true };
+
+  try {
+    const stored = JSON.parse(localStorage.getItem(optionsStorageKey));
+    if (stored && typeof stored === "object") {
+      if (typeof stored.includeUnused === "boolean") options.includeUnused = stored.includeUnused;
+      if (typeof stored.includeRpo === "boolean") options.includeRpo = stored.includeRpo;
+    }
+  } catch (error) {
+    console.warn("Could not load OST options:", error);
+  }
+
+  return options;
+}
+
+function storeOptions() {
+  try {
+    localStorage.setItem(optionsStorageKey, JSON.stringify({
+      includeUnused: includeUnusedCheckbox.checked,
+      includeRpo: includeRpoCheckbox.checked
+    }));
+  } catch (error) {
+    console.warn("Could not store OST options:", error);
+  }
+}
+
+function loadModeStore() {
+  let store = { version: 2, modes: {} };
 
   try {
     const stored = JSON.parse(localStorage.getItem(bestTimesStorageKey));
-    if (stored && stored.version === 1) {
-      bestTimes = {
-        version: 1,
-        tracks: stored.tracks && typeof stored.tracks === "object" ? stored.tracks : {},
-        total: Number.isFinite(stored.total) ? stored.total : null
+    if (stored && stored.version === 2 && stored.modes && typeof stored.modes === "object") {
+      store = { version: 2, modes: stored.modes };
+    } else if (stored && stored.version === 1) {
+      // old data means both checkboxes checked (all songs)
+      const bothKey = getGameModeKey(true, true);
+      store = {
+        version: 2,
+        modes: {
+          [bothKey]: {
+            tracks: stored.tracks && typeof stored.tracks === "object" ? stored.tracks : {},
+            total: Number.isFinite(stored.total) ? stored.total : null
+          }
+        }
       };
+      localStorage.setItem(bestTimesStorageKey, JSON.stringify(store));
     }
   } catch (error) {
     console.warn("Could not load best times:", error);
   }
 
-  return bestTimes;
+  return store;
 }
 
-function storeBestTimes(total, previousBestTimes) {
+function loadBestTimes(modeKey) {
+  const store = loadModeStore();
+  const entry = store.modes[modeKey];
+  return {
+    tracks: entry && typeof entry.tracks === "object" ? entry.tracks : {},
+    total: entry && Number.isFinite(entry.total) ? entry.total : null
+  };
+}
+
+function storeBestTimes(modeKey, total, previousBestTimes) {
+  const store = loadModeStore();
   const bestTimes = {
-    version: 1,
     tracks: { ...previousBestTimes.tracks },
     total: previousBestTimes.total
   };
@@ -107,8 +176,10 @@ function storeBestTimes(total, previousBestTimes) {
     bestTimes.total = total;
   }
 
+  store.modes[modeKey] = bestTimes;
+
   try {
-    localStorage.setItem(bestTimesStorageKey, JSON.stringify(bestTimes));
+    localStorage.setItem(bestTimesStorageKey, JSON.stringify(store));
   } catch (error) {
     console.warn("Could not store best times:", error);
   }
@@ -167,6 +238,7 @@ function loadCurrentSong() {
   audio = new Audio(`../heardle/previews/${song[0]}.mp3`);
   audio.loop = true;
   audio.preload = "auto";
+  audio.volume = Number(volumeSlider.value);
   songStartedAt = performance.now();
 
   return audio.play().catch(handlePlaybackFailure);
@@ -175,6 +247,10 @@ function loadCurrentSong() {
 function startGame() {
   if (hasStarted) return Promise.resolve();
   hasStarted = true;
+  currentGameMode = getGameModeKey(includeUnusedCheckbox.checked, includeRpoCheckbox.checked);
+  buildPlaylist();
+  includeUnusedDisplay.checked = includeUnusedCheckbox.checked;
+  includeRpoDisplay.checked = includeRpoCheckbox.checked;
   liveTimer.classList.add("running");
   if (!totalStartedAt) {
     totalStartedAt = performance.now();
@@ -293,6 +369,7 @@ function playFinishSound(isPersonalBest) {
   finishSound = new Audio(
     isPersonalBest ? "sounds/collect_special.mp3" : "sounds/collect.mp3"
   );
+  finishSound.volume = Number(volumeSlider.value);
   finishSound.play().catch((error) => {
     console.warn("Could not play finish sound:", error);
   });
@@ -322,7 +399,7 @@ function showResults() {
   cancelAnimationFrame(timerFrame);
   game.hidden = true;
   const total = performance.now() - totalStartedAt;
-  comparisonBestTimes = loadBestTimes();
+  comparisonBestTimes = loadBestTimes(currentGameMode);
   renderResultsRows();
 
   const formattedTotal = formatTime(total);
@@ -335,7 +412,7 @@ function showResults() {
     || totalDifference < 0;
   setDelta(totalDelta, totalDifference);
 
-  const updatedBestTimes = storeBestTimes(total, comparisonBestTimes);
+  const updatedBestTimes = storeBestTimes(currentGameMode, total, comparisonBestTimes);
   const bestSegmentsTotal = songs.reduce((sum, song) => {
     const best = updatedBestTimes.tracks[song[0]];
     return sum + (Number.isFinite(best) ? best : 0);
@@ -424,7 +501,14 @@ document.addEventListener("click", (event) => {
 
 unshuffle.addEventListener("change", renderResultsRows);
 
-playOverlay.addEventListener("click", async () => {
+includeUnusedCheckbox.addEventListener("change", storeOptions);
+includeRpoCheckbox.addEventListener("change", storeOptions);
+
+volumeSlider.addEventListener("input", () => {
+  if (audio) audio.volume = Number(volumeSlider.value);
+});
+
+startButton.addEventListener("click", async () => {
   await startGame();
   if (!hasStarted) return;
   playOverlay.hidden = true;
@@ -433,18 +517,21 @@ playOverlay.addEventListener("click", async () => {
 
 async function init() {
   input.disabled = true;
-  playOverlay.disabled = true;
+  startButton.disabled = true;
   unshuffle.checked = false;
+
+  const options = loadOptions();
+  includeUnusedCheckbox.checked = options.includeUnused;
+  includeRpoCheckbox.checked = options.includeRpo;
 
   try {
     songs = await loadSongs();
-    playlist = shuffle(songs);
     input.disabled = false;
-    playOverlay.disabled = false;
+    startButton.disabled = false;
   } catch (error) {
     console.error("OST game could not start:", error);
     input.placeholder = "Songs failed to load";
-    playOverlay.textContent = "Songs failed to load";
+    startButton.textContent = "Songs failed to load";
   }
 }
 

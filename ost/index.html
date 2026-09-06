@@ -9,14 +9,38 @@
     <script defer src="main.js"></script>
   </head>
   <body>
-    <button id="play-overlay" type="button">Click to Start</button>
+    <div id="play-overlay">
+      <button id="start-button" type="button">Click to Start</button>
+      <div class="play-options">
+        <label class="option-control">
+          <input id="include-unused" type="checkbox" checked>
+          Include Unused
+        </label>
+        <label class="option-control">
+          <input id="include-rpo" type="checkbox" checked>
+          Include Ready Player One
+        </label>
+      </div>
+    </div>
     <main>
       <section class="game" aria-label="OST%">
         <div class="game-summary">
           <h1 class="view-title">Egg Hunt 2018 OST%</h1>
           <output id="live-timer" aria-label="Total time">0:00.00</output>
         </div>
-        <p id="last-track">Last track: N/A</p>
+        <div class="last-track-row">
+          <div class="option-status">
+            <label class="option-control readonly">
+              <input id="include-unused-display" type="checkbox" disabled>
+              Include Unused
+            </label>
+            <label class="option-control readonly">
+              <input id="include-rpo-display" type="checkbox" disabled>
+              Include Ready Player One
+            </label>
+          </div>
+          <p id="last-track">Last track: N/A</p>
+        </div>
         <div class="game-panel">
           <form id="guess-form" novalidate>
             <div class="autocomplete">
@@ -40,6 +64,10 @@
               <ul id="song-list" role="listbox" hidden></ul>
             </div>
           </form>
+        </div>
+        <div class="volume-control">
+          <label for="volume-slider">Volume: </label>
+          <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="1">
         </div>
       </section>
 
